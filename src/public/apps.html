@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blog App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Blog App</h1>
+  <form id="postForm" enctype="multipart/form-data">
+    <input type="text" id="title" placeholder="Title" required>
+    <textarea id="description" placeholder="Description" required></textarea>
+    <input type="file" id="image" required>
+    <button type="submit">Post</button>
+  </form>
+
+  <div id="posts"></div>
+
+  <script>
+    document.getElementById('postForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('title').value);
+      formData.append('description', document.getElementById('description').value);
+      formData.append('image', document.getElementById('image').files[0]);
+
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        body: formData
+      });
+
+      const post = await response.json();
+      loadPosts(); // Reload posts after adding a new one
+    });
+
+    async function loadPosts() {
+      const response = await fetch('/api/posts');
+      const posts = await response.json();
+      const postsContainer = document.getElementById('posts');
+      postsContainer.innerHTML = '';
+      posts.forEach(post => {
+        const postElement = document.createElement('div');
+        postElement.innerHTML = `
+          <h3>${post.title}</h3>
+          <p>${post.description}</p>
+          <img src="/${post.image}" alt="Post Image">
+          <button onclick="likePost('${post._id}')">Like (${post.likes})</button>
+          <form onsubmit="postComment(event, '${post._id}')">
+            <input type="text" placeholder="Add a comment" required>
+            <button type="submit">Comment</button>
+          </form>
+          <div id="comments-${post._id}"></div>
+        `;
+        postsContainer.appendChild(postElement);
+
+        // Load comments for the post
+        post.comments.forEach(comment => {
+          const commentElement = document.createElement('div');
+          commentElement.textContent = comment.content;
+          document.getElementById(`comments-${post._id}`).appendChild(commentElement);
+        });
+      });
+    }
+
+    async function likePost(postId) {
+      await fetch(`/api/posts/${postId}/like`, { method: 'POST' });
+      loadPosts(); // Reload posts after liking
+    }
+
+    async function postComment(event, postId) {
+      event.preventDefault();
+      const commentContent = event.target.querySelector('input').value;
+      
+      await fetch('/api/comments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: commentContent, postId })
+      });
+
+      loadPosts(); // Reload posts after commenting
+    }
+
+    // Initial load
+    loadPosts();
+  </script>
+</body>
+</html>

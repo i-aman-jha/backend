@@ -1,0 +1,48 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+  }
+  
+  h1 {
+    text-align: center;
+  }
+  
+  #postForm {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  #postForm input, #postForm textarea {
+    padding: 10px;
+    margin: 5px 0;
+    width: 300px;
+  }
+  
+  #posts {
+    margin-top: 20px;
+  }
+  
+  #posts div {
+    background-color: white;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  button {
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  
+  button:hover {
+    background-color: #45a049;
+  }
+  
